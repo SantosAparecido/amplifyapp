@@ -61,6 +61,45 @@ function App() {
       <AmplifySignOut />
     </div>
   );
+  async function fetchNotes() {
+    const apiData = await API.graphql({ query: listNotes });
+    const notesFromAPI = apiData.data.listNotes.items;
+    await Promise.all(notesFromAPI.map(async note => {
+      if (note.image) {
+        const image = await Storage.get(note.image);
+        note.image = image;
+      }
+      return note;
+    }))
+    setNotes(apiData.data.listNotes.items);
+  }
+
+  async function createNote() {
+    if (!formData.name || !formData.description) return;
+    await API.graphql({ query: createNoteMutation, variables: { input: formData } });
+    if (formData.image) {
+      const image = await Storage.get(formData.image);
+      formData.image = image;
+    }
+    setNotes([ ...notes, formData ]);
+    setFormData(initialFormState);
+  }
+  <input
+    type="file"
+    onChange={onChange}
+  />
+  {
+    notes.map(note => (
+      <div key={note.id || note.name}>
+        <h2>{note.name}</h2>
+        <p>{note.description}</p>
+        <button onClick={() => deleteNote(note)}>Delete note</button>
+        {
+          note.image && <img src={note.image} style={{width: 400}}  alt=""/>
+        }
+      </div>
+    ))
+  }
 }
 
 export default withAuthenticator(App);
