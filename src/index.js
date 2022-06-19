@@ -7,7 +7,6 @@ import Amplify from 'aws-amplify';
 import config from './aws-exports';
 import { I18n } from 'aws-amplify';
 import AmplifyI18n from 'amplify-i18n';
-import { API, Storage } from 'aws-amplify';
 Amplify.configure(config);
 const locales = ["en", "fr", "pt-BR"]
 AmplifyI18n.configure(locales)
@@ -21,13 +20,6 @@ root.render(
   </React.StrictMode>
 );
 
-async function onChange(e) {
-  if (!e.target.files[0]) return
-  const file = e.target.files[0];
-  setFormData({ ...formData, image: file.name });
-  await Storage.put(file.name, file);
-  fetchNotes();
-}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
